@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  phone    String
+  role     String
+
+  kos      Kos[]
+  reviews  Review[]
+  books    Book[]
+}
+
+model Kos {
+  id              Int    @id @default(autoincrement())
+  user_id         Int
+  name            String
+  address         String
+  price_per_month Int
+  gender          String
+
+  user       User          @relation(fields: [user_id], references: [id])
+  images     KosImage[]
+  facilities KosFacility[]
+  reviews    Review[]
+  books      Book[]
+}
+
+model KosImage {
+  id     Int @id @default(autoincrement())
+  kos_id Int
+  file   String
+
+  kos Kos @relation(fields: [kos_id], references: [id])
+}
+
+model KosFacility {
+  id     Int @id @default(autoincrement())
+  kos_id Int
+  facility String
+
+  kos Kos @relation(fields: [kos_id], references: [id])
+}
+
+model Review {
+  id      Int @id @default(autoincrement())
+  kos_id  Int
+  comment String
+  user_id Int
+
+  kos  Kos  @relation(fields: [kos_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model Book {
+  id         Int @id @default(autoincrement())
+  kos_id     Int
+  user_id    Int
+  start_date DateTime
+  end_date   DateTime
+  status     String
+
+  kos  Kos  @relation(fields: [kos_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+}
